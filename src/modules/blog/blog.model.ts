@@ -1,9 +1,10 @@
-import { BaseModel } from '@/common/abstractModel/base.model';
-import BaseWhereInput from '@/common/dto/base-where.input';
 import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class Blog extends BaseModel {
+export class Blog {
+  @Field(() => Number)
+  public id: number;
+
   @Field(() => String, { nullable: true })
   title: string;
 
@@ -15,6 +16,18 @@ export class Blog extends BaseModel {
 
   @Field(() => String, { nullable: true })
   datePublished: string;
+
+  @Field(() => Number, { nullable: true })
+  createdBy?: number;
+
+  @Field(() => Number, { nullable: true })
+  updatedBy?: number;
+
+  @Field(() => GraphQLISODateTime)
+  createdAt: Date;
+
+  @Field(() => GraphQLISODateTime)
+  updatedAt: Date;
 }
 
 @ObjectType()

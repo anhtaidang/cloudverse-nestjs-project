@@ -14,9 +14,11 @@ export default class BaseWhereInput {
   id?: number;
 
   @Field(() => Number, { nullable: true })
+  @IsOptional()
   createdBy?: number;
 
   @Field(() => Number, { nullable: true })
+  @IsOptional()
   updatedBy?: number;
 
   @Type(() => DateTimeNullableFilter)

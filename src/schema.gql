@@ -2,16 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AuthLoginDto {
+  email: String!
+  password: String!
+}
+
+input AuthRegisterDTO {
+  confirmPassword: String!
+  email: String!
+  fullName: String!
+  password: String!
+  roleId: Float!
+}
+
 type Blog {
   author: String
   content: String
   createdAt: DateTime!
-  createdBy: Float!
+  createdBy: Float
   datePublished: String
-  id: ID!
+  id: Float!
   title: String
   updatedAt: DateTime!
-  updatedBy: Float!
+  updatedBy: Float
 }
 
 input BlogCreateInput {
@@ -19,15 +32,6 @@ input BlogCreateInput {
   content: String!
   datePublished: String!
   title: String!
-}
-
-input BlogOrderByInput {
-  author: SortOrder
-  createdAt: SortOrder
-  datePublished: SortOrder
-  id: SortOrder
-  title: SortOrder
-  updatedAt: SortOrder
 }
 
 input BlogUpdateInput {
@@ -50,6 +54,11 @@ input BlogWhereInput {
 
 input BlogWhereUniqueInput {
   id: Float!
+}
+
+input BooleanFilter {
+  equals: Boolean
+  not: Boolean
 }
 
 """
@@ -79,14 +88,68 @@ input FloatNullableFilter {
   notIn: [Float!]
 }
 
+type LoginResponse {
+  role: String!
+  user: User!
+}
+
 type Mutation {
   createBlog(data: BlogCreateInput!): Blog!
+  createPermissionRole(data: PermissionRoleCreateInput!): PermissionRole!
+  deleteBlog(where: BlogWhereUniqueInput!): Blog!
+  login(loginInput: AuthLoginDto!): LoginResponse!
+  logout: String!
+  refreshToken: String!
+  register(authRegister: AuthRegisterDTO!): RegisterResponse!
   updateBlog(data: BlogUpdateInput!, where: BlogWhereUniqueInput!): Blog!
+  updatePermissionRole(data: PermissionRoleUpdateInput!, where: PermissionRoleWhereUniqueInput!): PermissionRole!
+}
+
+type PermissionRole {
+  canDelete: Boolean
+  canRead: Boolean
+  canUpdate: Boolean
+  canWrite: Boolean
+  createdAt: DateTime!
+  id: Float!
+  nameRole: String
+  updatedAt: DateTime!
+}
+
+input PermissionRoleCreateInput {
+  canDelete: Boolean!
+  canRead: Boolean!
+  canUpdate: Boolean!
+  canWrite: Boolean!
+  nameRole: String!
+}
+
+input PermissionRoleUpdateInput {
+  canDelete: Boolean!
+  canRead: Boolean!
+  canUpdate: Boolean!
+  canWrite: Boolean!
+  nameRole: String
+}
+
+input PermissionRoleWhereInput {
+  canDelete: BooleanFilter
+  canRead: BooleanFilter
+  canUpdate: BooleanFilter
+  canWrite: BooleanFilter
+  id: FloatNullableFilter
+  nameRole: StringNullableFilter
+}
+
+input PermissionRoleWhereUniqueInput {
+  id: Float!
 }
 
 type Query {
-  blog(where: BlogWhereUniqueInput): Blog!
-  blogs(orderBy: [BlogOrderByInput!], skip: Float, take: Float = 10, where: BlogWhereInput): [Blog!]!
+  blog(where: BlogWhereUniqueInput!): Blog!
+  blogs(skip: Float, take: Float, where: BlogWhereInput!): [Blog!]!
+  permissionRole(where: PermissionRoleWhereUniqueInput!): PermissionRole!
+  permissionRoles(where: PermissionRoleWhereInput!): [PermissionRole!]!
 }
 
 enum QueryMode {
@@ -94,9 +157,9 @@ enum QueryMode {
   Insensitive
 }
 
-enum SortOrder {
-  Asc
-  Desc
+type RegisterResponse {
+  role: String!
+  user: User!
 }
 
 input StringNullableFilter {
@@ -112,4 +175,14 @@ input StringNullableFilter {
   not: String
   notIn: [String!]
   startsWith: String
+}
+
+type User {
+  avatarUrl: String
+  createdAt: DateTime
+  email: String!
+  fullName: String!
+  id: Float
+  password: String
+  updatedAt: DateTime
 }

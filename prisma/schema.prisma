@@ -11,11 +11,11 @@ datasource db {
 }
 
 model Blog {
-  id Int @id @default(autoincrement())
-  title String
-  author String
+  id            Int    @id @default(autoincrement())
+  title         String
+  author        String
   datePublished String
-  content String
+  content       String
 
   createdBy Int?
   updatedBy Int?
@@ -23,35 +23,52 @@ model Blog {
   updatedAt DateTime @updatedAt
 }
 
-
 model PermissionRole {
-  id        Int    @id @default(autoincrement())
-  nameRole  String
+  id       Int    @id @default(autoincrement())
+  nameRole String
 
   canRead   Boolean
   canWrite  Boolean
   canDelete Boolean
   canUpdate Boolean
 
-  user User?
+  // user User
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  PermissionRoleMap UserRoleMap[] @relation("PermissionRoleMap")
+  // UserRoleMap UserRoleMap[] @relation("PermissionRoleMap")
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
-
 
 model User {
-  id              Int       @id @default(autoincrement())
-  fullName        String
-  avatarUrl       String?
-  username        String    @unique
-  email           String    @unique
-  password        String
+  id        Int     @id @default(autoincrement())
+  fullName  String
+  avatarUrl String?
+  username  String  @unique
+  email     String  @unique
+  password  String
 
-  role PermissionRole @relation(fields: [permissionRoleId], references: [id])
-  permissionRoleId  Int @unique
+  // role             PermissionRole @relation(fields: [permissionRoleId], references: [id])
+  // permissionRoleId Int
+  
+  UserRoleMap     UserRoleMap[] @relation("UserRoleMap")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }
 
+model UserRoleMap {
+  id     Int @id @default(autoincrement())
+  userId Int
+  roleId Int
+
+  role PermissionRole @relation("PermissionRoleMap", fields: [roleId], references: [id])
+  user User @relation("UserRoleMap", fields: [userId], references: [id])
+
+  createdBy        Int?
+  updatedBy        Int?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}

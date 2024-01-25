@@ -6,20 +6,20 @@ export default class BlogUpdateInput {
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title?: string;
 
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
-  author: string;
+  author?: string;
 
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
-  datePublished: string;
+  datePublished?: string;
 
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
-  content: string;
+  content?: string;
 }

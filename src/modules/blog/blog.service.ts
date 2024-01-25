@@ -1,8 +1,15 @@
 import PrismaService from '@/prisma.service';
+import PrismaSelectService from '@/prismaSelect.service';
+import { Injectable } from '@nestjs/common';
 import { Blog, Prisma } from '@prisma/client';
+import { GraphQLResolveInfo } from 'graphql';
 
+@Injectable()
 export default class BlogService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly prismaSelectService: PrismaSelectService,
+  ) {}
 
   public async create<T extends Prisma.BlogCreateArgs>(
     args: Prisma.SelectSubset<T, Prisma.BlogCreateArgs>,
@@ -24,7 +31,15 @@ export default class BlogService {
 
   public async findOne<T extends Prisma.BlogFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.BlogFindUniqueArgs>,
+    info?: GraphQLResolveInfo,
   ): Promise<Blog> {
-    return this.prisma.blog.findUnique(args);
+    const select = this.prismaSelectService.getValue(info);
+    return this.prisma.blog.findUnique({ ...select, ...args });
+  }
+
+  public async delete<T extends Prisma.BlogFindUniqueArgs>(
+    args: Prisma.SelectSubset<T, Prisma.BlogFindUniqueArgs>,
+  ) {
+    return this.prisma.blog.delete(args);
   }
 }

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { verify } from 'jsonwebtoken';
+import { Request } from 'express';
 @Injectable()
-export class TokenService {
+export default class TokenService {
   constructor(private configService: ConfigService) {}
 
   extractToken(connectionParams: any): string | null {
@@ -10,13 +11,17 @@ export class TokenService {
   }
 
   validateToken(token: string): any {
-    const refreshTokenSecret = this.configService.get<string>(
-      'REFRESH_TOKEN_SECRET',
+    const accessTokenSecret = this.configService.get<string>(
+      'ACCESS_TOKEN_SECRET',
     );
     try {
-      return verify(token, refreshTokenSecret);
+      return verify(token, accessTokenSecret);
     } catch (error) {
       return null;
     }
+  }
+
+  getTokenFromCookie(request: Request): string | undefined {
+    return request.cookies?.access_token;
   }
 }

@@ -1,16 +1,28 @@
-import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import BlogModule from './modules/blogPost/blog.module';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import PrismaService from './prisma.service';
-import { TokenService } from './token/token.service';
+import BlogModule from './modules/blog/blog.module';
+import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
+import AuthModule from './modules/auth/auth.module';
+import TokenService from './token/token.service';
+import BlogTaskService from './cron/BlogTaskService';
+import { ScheduleModule } from '@nestjs/schedule';
+import { GraphQLError } from 'graphql';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
+    }),
+    PermissionRoleModule,
+    AuthModule,
     BlogModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       imports: [ConfigModule, AppModule],
@@ -31,7 +43,7 @@ import { TokenService } from './token/token.service';
           },
           onConnect: (connectionParams) => {
             const token = tokenService.extractToken(connectionParams);
-
+            console.log('connectionParams');
             if (!token) {
               throw new Error('Token not provided');
             }
@@ -44,28 +56,30 @@ import { TokenService } from './token/token.service';
           context: ({ req, res }) => {
             return { req, res };
           },
-          // formatError: (error) => {
-          //   const originalError = error.extensions
-          //     ?.originalError as GraphQLError;
-          //
-          //   if (!originalError) {
-          //     return {
-          //       message: error.message,
-          //       code: error.extensions?.code,
-          //     };
-          //   }
-          //   return {
-          //     message: originalError.message,
-          //     code: error.extensions?.code,
-          //   };
-          // },
+          formatError: (error) => {
+            const originalError = error.extensions
+              ?.originalError as GraphQLError;
+
+            if (!originalError) {
+              return {
+                message: error.message,
+                code: error.extensions?.code,
+              };
+            }
+            return {
+              message: originalError.message,
+              code: error.extensions?.code,
+            };
+          },
         };
       },
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ScheduleModule.forRoot(),
   ],
-  // controllers: [],
-  // providers: [],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, TokenService, PrismaService, BlogTaskService],
 })
 export class AppModule {}
