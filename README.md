@@ -221,10 +221,6 @@ You can check out the documentation of project at http://localhost:4400
   </div>
 
   <div align="center">
-    <img src="./src/document/img/queries-2.png" alt="queries1"/>
-  </div>
-
-  <div align="center">
     <img src="./src/document/img/mutations-1.png" alt="mutations"/>
   </div>
 
