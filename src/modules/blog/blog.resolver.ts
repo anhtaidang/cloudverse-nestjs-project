@@ -71,7 +71,7 @@ export default class BlogResolver {
   @UseGuards(UserAuthGuard)
   @Query(() => [Blog])
   public async blogs(
-    @Args('where') where: BlogWhereInput,
+    @Args('where') where?: BlogWhereInput,
     @Args('skip', { nullable: true }) skip?: number,
     @Args('take', { nullable: true }) take?: number,
   ): Promise<Blog[]> {

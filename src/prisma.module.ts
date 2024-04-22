@@ -6,4 +6,4 @@ import PrismaSelectService from './prismaSelect.service';
   providers: [PrismaService, PrismaSelectService],
   exports: [PrismaService, PrismaSelectService],
 })
-export class PrismaModule {}
+export default class PrismaModule {}

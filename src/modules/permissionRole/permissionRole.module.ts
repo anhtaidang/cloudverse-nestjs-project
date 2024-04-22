@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import PermissionRoleService from './permissionRole.service';
 import PermissionRoleResolver from './permissionRole.resolver';
-import { PrismaModule } from '@/prisma.module';
+import PrismaModule from '@/prisma.module';
 
 @Module({
   imports: [PrismaModule],
@@ -13,5 +13,6 @@ import { PrismaModule } from '@/prisma.module';
     JwtService,
     ConfigService,
   ],
+  exports: [PermissionRoleService],
 })
 export default class PermissionRoleModule {}

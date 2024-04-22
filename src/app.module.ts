@@ -5,15 +5,15 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import BlogModule from './modules/blog/blog.module';
-import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
-import AuthModule from './modules/auth/auth.module';
-import TokenService from './token/token.service';
-import BlogTaskService from './cron/BlogTaskService';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GraphQLError } from 'graphql';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { PrismaModule } from './prisma.module';
+import PrismaModule from './prisma.module';
+import BlogModule from './modules/blog/blog.module';
+import BlogTaskService from './cron/BlogTaskService';
+import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
+import AuthModule from './modules/auth/auth.module';
+import TokenService from './token/token.service';
 
 @Module({
   imports: [

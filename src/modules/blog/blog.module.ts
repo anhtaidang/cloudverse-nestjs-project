@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import TokenService from '@/token/token.service';
 import BlogService from './blog.service';
 import BlogResolver from './blog.resolver';
-import { PrismaModule } from '@/prisma.module';
+import PrismaModule from '@/prisma.module';
 
 @Module({
   imports: [PrismaModule],
@@ -15,5 +15,6 @@ import { PrismaModule } from '@/prisma.module';
     JwtService,
     ConfigService,
   ],
+  exports: [BlogService],
 })
 export default class BlogModule {}
