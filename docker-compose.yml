@@ -2,14 +2,20 @@ version: '3.1'
 
 services:
   postgres:
-    image: postgres:10
-    container_name: postgres_dummy_api
+    image: postgres:13
+    container_name: ${ENV_DEPLOY}-${APP_NAME}
+    command: >
+      -c max_connections=1000
+      -c shared_buffers=1GB
+    restart: always
     ports:
-      - '5432:5432'
+      - "${DB_PORT_MOUNT}:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: anhtaidang
       POSTGRES_DB: cloudverse
+    env_file:
+      - .env
     volumes:
       - my_postgres_data:/var/lib/postgresql/data
 

@@ -11,7 +11,7 @@ export default class BlogTaskService {
 
   private readonly logger = new Logger(BlogTaskService.name);
 
-  @Cron(CronExpression.EVERY_10_SECONDS, {
+  @Cron(CronExpression.EVERY_DAY_AT_1AM, {
     name: 'getBlogSchedule',
   })
   async handleCron() {

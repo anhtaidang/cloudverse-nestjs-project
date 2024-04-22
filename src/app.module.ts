@@ -5,7 +5,6 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import PrismaService from './prisma.service';
 import BlogModule from './modules/blog/blog.module';
 import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
 import AuthModule from './modules/auth/auth.module';
@@ -14,6 +13,7 @@ import BlogTaskService from './cron/BlogTaskService';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GraphQLError } from 'graphql';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { PrismaModule } from './prisma.module';
 
 @Module({
   imports: [
@@ -21,9 +21,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/',
     }),
-    PermissionRoleModule,
-    AuthModule,
-    BlogModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       imports: [ConfigModule, AppModule],
       inject: [ConfigService],
@@ -78,8 +75,12 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
+    PrismaModule,
+    AuthModule,
+    PermissionRoleModule,
+    BlogModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TokenService, PrismaService, BlogTaskService],
+  providers: [AppService, TokenService, PrismaModule, BlogTaskService],
 })
 export class AppModule {}
