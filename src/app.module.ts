@@ -1,22 +1,36 @@
 import { join } from 'path';
+import { GraphQLError } from 'graphql';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ScheduleModule } from '@nestjs/schedule';
-import { GraphQLError } from 'graphql';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import PrismaModule from './prisma.module';
-import BlogModule from './modules/blog/blog.module';
-import BlogTaskService from './cron/BlogTaskService';
-import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
 import AuthModule from './modules/auth/auth.module';
+import BlogModule from './modules/blog/blog.module';
+import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
 import TokenService from './token/token.service';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
+import BlogTaskService from './cron/BlogTaskService';
+import { CustomThrottlerGuard } from './guards/throttler.guard';
+import TestModule from './modules/test/test.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.get('THROTTLE_TTL'),
+          limit: config.get('THROTTLE_LIMIT'),
+        },
+      ],
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/',
@@ -79,8 +93,18 @@ import TokenService from './token/token.service';
     AuthModule,
     PermissionRoleModule,
     BlogModule,
+    TestModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TokenService, PrismaModule, BlogTaskService],
+  providers: [
+    PrismaModule,
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottlerGuard,
+    },
+    TokenService,
+    BlogTaskService,
+  ],
 })
 export class AppModule {}

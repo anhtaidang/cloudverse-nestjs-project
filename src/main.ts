@@ -5,7 +5,12 @@ import cookieParser from 'cookie-parser';
 import RateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import compression from 'compression';
-import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import { environment } from './common/enrironment';
 import { AppModule } from './app.module';
 
@@ -15,6 +20,8 @@ async function bootstrap() {
   });
 
   const env = environment();
+
+  const logger = new Logger(bootstrap.name);
 
   app.enableCors({
     credentials: true,
@@ -30,7 +37,7 @@ async function bootstrap() {
   });
   app.use(cookieParser());
   app.use(express.json());
-  app.useLogger(new Logger());
+  app.useLogger(logger);
 
   if (env.isProduction) {
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
@@ -61,6 +68,12 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.use((req: Request, res: Response, next) => {
+    logger.debug('===TRIGGER GLOBAL MIDDLEWARE===');
+    next();
+  });
+
   await app.listen(3000, () => {
     // Logger.log(`Server is running at ${siteUrl}graphql`);
     Logger.log(`Server is running at localhost:${3000} graphql`);
