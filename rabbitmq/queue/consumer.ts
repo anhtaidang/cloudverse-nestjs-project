@@ -8,12 +8,14 @@ async function receiveQueue() {
     console.log('Connect to::', process.env.RABBITMQ_URL_DOCKER);
     // 1. Create connect
     const conn = await amqplib.connect(process.env.RABBITMQ_URL_DOCKER ?? '');
+
     // 2. Create channel
     const channel = await conn.createChannel();
+
     // 3. Create queue
     const nameQueue = 'q1';
 
-    await channel.assertQueue(nameQueue, { durable: false });
+    await channel.assertQueue(nameQueue, { durable: true });
 
     // 4. Receive to queue
     await channel.consume(
