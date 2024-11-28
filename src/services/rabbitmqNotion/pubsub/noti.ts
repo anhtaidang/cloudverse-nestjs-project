@@ -13,7 +13,7 @@ const receiveNoti = async () => {
     const channel = await conn.createChannel();
 
     // 3. Create exchange
-    const nameExchange = 'video';
+    const nameExchange = 'job-trigger-data-exchange';
 
     await channel.assertExchange(nameExchange, 'fanout', {
       durable: false, // True:::  When restart Queue do not lose message
@@ -22,7 +22,7 @@ const receiveNoti = async () => {
     // 4. Create queue
     const {
       queue, // name queue
-    } = await channel.assertQueue('', {
+    } = await channel.assertQueue('job-trigger-data-queue-main', {
       exclusive: true, // Auto remove queue
     });
 

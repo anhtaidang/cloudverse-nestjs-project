@@ -12,12 +12,16 @@ import PrismaModule from './prisma.module';
 import AuthModule from './modules/auth/auth.module';
 import BlogModule from './modules/blog/blog.module';
 import PermissionRoleModule from './modules/permissionRole/permissionRole.module';
-import TokenService from './token/token.service';
+import TokenService from './services/token/token.service';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import BlogTaskService from './cron/BlogTaskService';
-import { CustomThrottlerGuard } from './guards/throttler.guard';
+// import { CustomThrottlerGuard } from './guards/throttler.guard';
 import TestModule from './modules/test/test.module';
+import CURLModule from './services/curlService/curl.module';
+import { RedisCacheModule } from './services/redis-cache/redis-cache.module';
+import { RedislockModule } from './services/redis-cache/redis-lock/redis-lock.module';
+import { RMQModule } from './services/rabbitMQ/rmq.module';
 
 @Module({
   imports: [
@@ -40,7 +44,7 @@ import TestModule from './modules/test/test.module';
       inject: [ConfigService],
       driver: ApolloDriver,
       useFactory: async (
-        configService: ConfigService,
+        // configService: ConfigService,
         tokenService: TokenService,
       ) => {
         return {
@@ -54,7 +58,6 @@ import TestModule from './modules/test/test.module';
           },
           onConnect: (connectionParams) => {
             const token = tokenService.extractToken(connectionParams);
-            console.log('connectionParams');
             if (!token) {
               throw new Error('Token not provided');
             }
@@ -90,6 +93,10 @@ import TestModule from './modules/test/test.module';
     }),
     ScheduleModule.forRoot(),
     PrismaModule,
+    CURLModule,
+    RMQModule,
+    RedislockModule,
+    RedisCacheModule,
     AuthModule,
     PermissionRoleModule,
     BlogModule,
@@ -99,10 +106,10 @@ import TestModule from './modules/test/test.module';
   providers: [
     PrismaModule,
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: CustomThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: CustomThrottlerGuard,
+    // },
     TokenService,
     BlogTaskService,
   ],

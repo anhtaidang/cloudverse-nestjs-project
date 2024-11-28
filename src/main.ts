@@ -70,7 +70,7 @@ async function bootstrap() {
   );
 
   app.use((req: Request, res: Response, next) => {
-    logger.debug('===TRIGGER GLOBAL MIDDLEWARE===');
+    // logger.debug('===TRIGGER GLOBAL MIDDLEWARE===');
     next();
   });
 

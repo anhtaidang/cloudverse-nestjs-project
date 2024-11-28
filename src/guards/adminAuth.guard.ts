@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import TokenService from '@/token/token.service';
+import TokenService from '@/services/token/token.service';
 
 @Injectable()
 export default class AdminAuthGuard implements CanActivate {

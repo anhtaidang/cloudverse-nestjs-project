@@ -1,0 +1,72 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Setting SSH connect
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Print GitHub environment variables
+      run: |
+        echo "Repository: $GITHUB_REPOSITORY"
+        echo "Branch/Tag: $GITHUB_REF"
+        echo "Commit SHA: $GITHUB_SHA"
+        echo "VARS =================================="
+        echo "CHECK ${{ vars.DOCKER_IMPLEMENT_PATH }}"
+        echo "CHECK ${{ vars.DOCKER_PATH }}"
+    
+    - name: RUN SUDO APT
+      run: |
+        docker --version
+
+    # Copy docker-compose.yml .env to VPS
+    - name: Copy docker-compose.yml to VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
+        
+        if [ -d ${{ vars.DOCKER_PATH }} ]; then
+          echo 'Folder exists ${{ vars.DOCKER_PATH }}';
+        else
+          echo 'Folder does not exist';
+          # exit 1;
+          echo '[RUN]: mkdir ${{ vars.DOCKER_PATH }}';
+          mkdir -p ${{ vars.DOCKER_PATH }};
+          chmod u+w ${{ vars.DOCKER_PATH }} -R
+        fi
+
+        EOF
+        
+        echo 'Staring scp...';
+        scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:${{ vars.DOCKER_IMPLEMENT_PATH }}
+        scp -o StrictHostKeyChecking=no .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:${{ vars.DOCKER_IMPLEMENT_PATH }}
+
+    # Connect SSH & RUN docker-compose
+    - name: Connect SSH & RUN docker-compose
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
+
+        echo "Acccess to ${{ vars.DOCKER_PATH }}"
+        cd ${{ vars.DOCKER_PATH }}
+
+        echo '=========';
+        ls -a
+     
+        echo '=========';
+        echo '[RUN]:  docker-compose up -d --build';
+        docker-compose up -d --build
+
+        EOF

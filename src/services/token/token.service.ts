@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { verify } from 'jsonwebtoken';
 import { Request } from 'express';
 @Injectable()
 export default class TokenService {
+  private logger = new Logger(TokenService.name);
   constructor(private configService: ConfigService) {}
 
   extractToken(connectionParams: any): string | null {
