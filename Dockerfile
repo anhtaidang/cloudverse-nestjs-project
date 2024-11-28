@@ -28,7 +28,7 @@ FROM node:21-alpine AS deloy
 RUN apk add --no-cache bash curl
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./

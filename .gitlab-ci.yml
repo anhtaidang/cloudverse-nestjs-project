@@ -1,0 +1,72 @@
+
+variables: 
+  SSH_KEY_PATH: "~/.ssh/id_rsa"
+  WORK_SPACE_PATH: "workspace/docker-implement"
+  SSH_HOST: "$VPS_USER@$VPS_HOST"
+
+stages:
+  # - print-info
+  - deploy
+  
+# print-info:
+#   stage: print-info
+#   script:
+#     - echo "VPS_HOST $VPS_HOST"
+#     - echo "VPS_USER $VPS_USER"
+#     - echo "SSH_KEY_PATH $SSH_KEY_PATH"
+#     - echo "WORK_SPACE_PATH $WORK_SPACE_PATH"
+#     - echo "SSH_PRIVATE_KEY $SSH_PRIVATE_KEY"
+#     - echo "SSH_HOST ${SSH_HOST}"
+#   only:
+#     - main
+
+
+deploy-to-vps:
+  stage: deploy
+  image: ubuntu:latest
+  before_script:
+    - echo "VPS_HOST $VPS_HOST"
+    - echo "VPS_USER $VPS_USER"
+    - echo "SSH_KEY_PATH $SSH_KEY_PATH"
+    - echo "WORK_SPACE_PATH $WORK_SPACE_PATH"
+    # - echo "SSH_PRIVATE_KEY $SSH_PRIVATE_KEY"
+    - echo "SSH_HOST ${SSH_HOST}"
+
+    - apt-get update -y
+    - apt-get install -y openssh-client rsync
+    - mkdir -p ~/.ssh 
+    - echo "$SSH_PRIVATE_KEY_BASE64" | base64 -d > ~/.ssh/id_rsa
+    # - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H ${VPS_HOST} >> ~/.ssh/known_hosts
+  script:
+    # Check folder WORK_PATH
+    - echo "Check folder WORK_PATH"
+    - ssh $SSH_HOST "
+        if [ -d '$WORK_SPACE_PATH' ]; then 
+          echo 'Directory exists'; 
+        else 
+          echo 'Directory does not exist';
+          mkdir -p $WORK_SPACE_PATH;
+          chmod u+w $WORK_SPACE_PATH -R;
+        fi"
+
+    # Copy file to VPS
+    - echo "Copying docker-compose.yml .env to VPS..."
+    - scp docker-compose.yml $VPS_USER@$VPS_HOST:/home/$VPS_USER/workspace/docker-implement/docker-compose.yml
+    - scp .env $VPS_USER@$VPS_HOST:/home/$VPS_USER/workspace/docker-implement/.env
+
+    # SSH to VPS and RUN docker services
+    - echo "Running docker-compose on VPS..."
+    - ssh $SSH_HOST "
+        cd ${WORK_SPACE_PATH};
+        ls -la;
+        if [ -e 'docker-compose.yml' ]; then 
+          docker-compose down;
+          docker-compose up -d --build;
+        else 
+          echo 'FAILD JOB !!!';
+          exit 1;
+        fi"
+  only:
+    - main
